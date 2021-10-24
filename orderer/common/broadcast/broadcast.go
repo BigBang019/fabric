@@ -7,7 +7,12 @@ SPDX-License-Identifier: Apache-2.0
 package broadcast
 
 import (
+	"fmt"
 	"io"
+	"os"
+	"runtime"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/hyperledger/fabric/common/flogging"
@@ -132,6 +137,17 @@ func (mt *MetricsTracker) BeginEnqueue() {
 	mt.EnqueueStartTime = time.Now()
 }
 
+func GoID() int {
+	var buf [64]byte
+	n := runtime.Stack(buf[:], false)
+	idField := strings.Fields(strings.TrimPrefix(string(buf[:n]), "goroutine "))[0]
+	id, err := strconv.Atoi(idField)
+	if err != nil {
+		panic(fmt.Sprintf("cannot get goroutine id: %v", err))
+	}
+	return id
+}
+
 // ProcessMessage validates and enqueues a single message
 func (bh *Handler) ProcessMessage(msg *cb.Envelope, addr string) (resp *ab.BroadcastResponse) {
 	tracker := &MetricsTracker{
@@ -158,6 +174,8 @@ func (bh *Handler) ProcessMessage(msg *cb.Envelope, addr string) (resp *ab.Broad
 	}
 
 	if !isConfig {
+		tmpTime := time.Now().UnixNano()
+		logger.Infof("zxypid: %d, zxytid: %d, zxyTime: %d, zxyTxid: %s", os.Getpid(), GoID(), tmpTime/1000000, chdr.TxId)
 		logger.Debugf("[channel: %s] Broadcast is processing normal message from %s with txid '%s' of type %s", chdr.ChannelId, addr, chdr.TxId, cb.HeaderType_name[chdr.Type])
 
 		configSeq, err := processor.ProcessNormalMsg(msg)

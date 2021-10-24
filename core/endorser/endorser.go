@@ -9,7 +9,11 @@ package endorser
 import (
 	"context"
 	"fmt"
+	"os"
+	"regexp"
+	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -419,6 +423,17 @@ func (e *Endorser) preProcess(signedProp *pb.SignedProposal) (*validateResult, e
 	return vr, nil
 }
 
+func GoID() int {
+	var buf [64]byte
+	n := runtime.Stack(buf[:], false)
+	idField := strings.Fields(strings.TrimPrefix(string(buf[:n]), "goroutine "))[0]
+	id, err := strconv.Atoi(idField)
+	if err != nil {
+		panic(fmt.Sprintf("cannot get goroutine id: %v", err))
+	}
+	return id
+}
+
 // ProcessProposal process the Proposal
 func (e *Endorser) ProcessProposal(ctx context.Context, signedProp *pb.SignedProposal) (*pb.ProposalResponse, error) {
 	// start time for computing elapsed time metric for successfully endorsed proposals
@@ -426,7 +441,7 @@ func (e *Endorser) ProcessProposal(ctx context.Context, signedProp *pb.SignedPro
 	e.Metrics.ProposalsReceived.Add(1)
 
 	addr := util.ExtractRemoteAddress(ctx)
-	endorserLogger.Debug("Entering: request from", addr)
+	endorserLogger.Infof("Entering: request from", addr)
 
 	// variables to capture proposal duration metric
 	var chainID string
@@ -445,7 +460,7 @@ func (e *Endorser) ProcessProposal(ctx context.Context, signedProp *pb.SignedPro
 			e.Metrics.ProposalDuration.With(meterLabels...).Observe(time.Since(startTime).Seconds())
 		}
 
-		endorserLogger.Debug("Exit: request from", addr)
+		endorserLogger.Infof("Exit: request from", addr)
 	}()
 
 	// 0 -- check and validate
@@ -480,7 +495,6 @@ func (e *Endorser) ProcessProposal(ctx context.Context, signedProp *pb.SignedPro
 			return &pb.ProposalResponse{Response: &pb.Response{Status: 500, Message: err.Error()}}, nil
 		}
 	}
-
 	txParams := &ccprovider.TransactionParams{
 		ChannelID:            chainID,
 		TxID:                 txid,
@@ -489,13 +503,18 @@ func (e *Endorser) ProcessProposal(ctx context.Context, signedProp *pb.SignedPro
 		TXSimulator:          txsim,
 		HistoryQueryExecutor: historyQueryExecutor,
 	}
+	payLoad := string(prop.Payload)
+	reg := regexp.MustCompile(`.*writeonly`)
+	payLoad = reg.ReplaceAllString(payLoad, "writeonly")
+	reg = regexp.MustCompile(`[^0-9a-zA-Z]`)
+	payLoad = reg.ReplaceAllString(payLoad, ",")
+	tmpTime := time.Now().UnixNano()
+	endorserLogger.Infof("zxypid: %d, zxytid: %d, zxyTime: %d, zxyTxid: %s, zxyProposal: %s", os.Getpid(), GoID(), tmpTime/1000000, txid, payLoad)
 	// this could be a request to a chainless SysCC
-
 	// TODO: if the proposal has an extension, it will be of type ChaincodeAction;
 	//       if it's present it means that no simulation is to be performed because
 	//       we're trying to emulate a submitting peer. On the other hand, we need
 	//       to validate the supplied action before endorsing it
-
 	// 1 -- simulate
 	cd, res, simulationResult, ccevent, err := e.SimulateProposal(txParams, hdrExt.ChaincodeId)
 	if err != nil {

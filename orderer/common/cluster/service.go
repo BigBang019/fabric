@@ -8,7 +8,12 @@ package cluster
 
 import (
 	"context"
+	"fmt"
 	"io"
+	"os"
+	"runtime"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/hyperledger/fabric/common/flogging"
@@ -70,8 +75,20 @@ func (s *Service) Step(stream orderer.Cluster_StepServer) error {
 	}
 }
 
+func GoID() int {
+	var buf [64]byte
+	n := runtime.Stack(buf[:], false)
+	idField := strings.Fields(strings.TrimPrefix(string(buf[:n]), "goroutine "))[0]
+	id, err := strconv.Atoi(idField)
+	if err != nil {
+		panic(fmt.Sprintf("cannot get goroutine id: %v", err))
+	}
+	return id
+}
+
 func (s *Service) handleMessage(stream StepStream, addr string, exp *certificateExpirationCheck) error {
 	request, err := stream.Recv()
+	s.Logger.Infof("zxypid: %d, zxytid: %d, zxy, zxyaddr: %s, zxyreq: %s", os.Getpid(), GoID(), addr, requestAsString(request))
 	if err == io.EOF {
 		return err
 	}

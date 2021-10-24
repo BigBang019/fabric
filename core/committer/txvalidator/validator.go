@@ -198,6 +198,8 @@ func (v *TxValidator) Validate(block *common.Block) error {
 			}
 		}
 	}
+	tmpTime := time.Now().UnixNano()
+	logger.Infof("zxyValidationTime: %d, zxyTxid: %s, zxyBlockNum: %d", tmpTime/1000000, txidArray, block.Header.Number)
 
 	// if we're here, all workers have completed the validation.
 	// If there was an error we return the error from the first
