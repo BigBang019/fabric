@@ -50,6 +50,10 @@ func NewReceiver() *Receiver {
 	}
 }
 
+func (mbc *Receiver) ProcessTransaction(env *cb.Envelope) bool {
+	return false
+}
+
 // Ordered will add or cut the batch according to the state of Receiver, it blocks reading from Block on return
 func (mbc *Receiver) Ordered(env *cb.Envelope) ([][]*cb.Envelope, bool) {
 	defer func() {
@@ -96,6 +100,10 @@ func (mbc *Receiver) Cut() []*cb.Envelope {
 	res := mbc.curBatch
 	mbc.curBatch = nil
 	return res
+}
+
+func (mbc *Receiver) ProcessBlock() ([]*cb.Envelope, []*cb.Envelope) {
+	return mbc.curBatch, mbc.curBatch
 }
 
 func (mbc *Receiver) CurBatch() []*cb.Envelope {
