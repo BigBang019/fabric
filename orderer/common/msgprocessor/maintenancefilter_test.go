@@ -423,6 +423,7 @@ func makeConfigEnvelopeWithExtraStuff(t *testing.T, current, next consensusTypeI
 					AbsoluteMaxBytes:  10241024,
 					MaxMessageCount:   1024,
 					PreferredMaxBytes: 10241024,
+					MaxUniqueKeys:     1024,
 				}),
 			ModPolicy: channelconfig.AdminsPolicyKey,
 		}

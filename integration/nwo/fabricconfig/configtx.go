@@ -79,6 +79,7 @@ type BatchSize struct {
 	MaxMessageCount   string `yaml:"MaxMessageCount,omitempty"`
 	AbsoluteMaxBytes  string `yaml:"AbsoluteMaxBytes,omitempty"`
 	PreferredMaxBytes string `yaml:"PreferredMaxBytes,omitempty"`
+	MaxUniqueKeys     string `yaml:"MaxUniqueKeys,omitempty"`
 
 	ExtraProperties map[string]interface{} `yaml:",inline,omitempty"`
 }
