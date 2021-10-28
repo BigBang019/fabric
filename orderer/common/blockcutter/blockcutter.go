@@ -9,15 +9,14 @@ package blockcutter
 import (
 	"time"
 
-	"github.com/golang/protobuf/proto"
+	"github.com/gogo/protobuf/proto"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/rwsetutil"
 	"github.com/hyperledger/fabric/orderer/common/resolver"
 	cb "github.com/hyperledger/fabric/protos/common"
-	"github.com/hyperledger/fabric/protos/utils"
-
 	"github.com/hyperledger/fabric/protos/ledger/rwset/kvrwset"
+	"github.com/hyperledger/fabric/protos/utils"
 )
 
 var logger = flogging.MustGetLogger("orderer.common.blockcutter")
@@ -92,8 +91,9 @@ func NewReceiverImpl(channelID string, sharedConfigFetcher OrdererConfigFetcher,
 		keyVersionMap: make(map[uint32]*kvrwset.Version),
 		keyTxMap:      make(map[uint32][]int32),
 
-		uniqueKeyCounter:    0,
-		uniqueKeyMap:        make(map[string]uint32),
+		uniqueKeyCounter: 0,
+		uniqueKeyMap:     make(map[string]uint32),
+
 		sharedConfigFetcher: sharedConfigFetcher,
 		Metrics:             metrics,
 		ChannelID:           channelID,
@@ -127,7 +127,6 @@ func (r *receiver) ProcessTransaction(msg *cb.Envelope) bool {
 
 	// get current transaction id
 	tid := r.txCounter
-
 	data := make([]byte, messageSizeBytes(msg))
 
 	var err error
@@ -144,8 +143,28 @@ func (r *receiver) ProcessTransaction(msg *cb.Envelope) bool {
 			if err = txRWSet.FromProtoBytes(resppayload.Results); err != nil {
 				logger.Infof("from proto bytes error")
 			} else {
-				for _, ns := range txRWSet.NsRwSets[1:] {
+				// logger.Info("---------------------")
+				// for _, nsRwSet := range txRWSet.NsRwSets {
+				// 	namespace := nsRwSet.NameSpace
+				// 	logger.Info("namespace: ", namespace)
+				// 	nsRwSet := nsRwSet.KvRwSet
+				// 	reads := nsRwSet.Reads
+				// 	writes := nsRwSet.Writes
+				// 	for _, read := range reads {
+				// 		key := read.Key
+				// 		version := read.Version
+				// 		logger.Info("read ", key, version)
+				// 	}
+				// 	for _, write := range writes {
+				// 		key := write.Key
+				// 		logger.Info("write ", key)
+				// 	}
+				// }
 
+				for _, ns := range txRWSet.NsRwSets {
+					if ns.NameSpace == "lscc" {
+						continue
+					}
 					// generate key for each key in the read and write set and use it to insert the read/write key into RW matrices
 					for _, write := range ns.KvRwSet.Writes {
 						writeKey := write.GetKey()
@@ -167,7 +186,6 @@ func (r *receiver) ProcessTransaction(msg *cb.Envelope) bool {
 							// cut the block, and redo the work
 							return true
 						}
-
 						index := key / 64
 						writeSet[index] |= (uint64(1) << (key % 64))
 					}
@@ -215,7 +233,6 @@ func (r *receiver) ProcessTransaction(msg *cb.Envelope) bool {
 				// make sure the number of unique keys in the block will not overflow
 			}
 		} else {
-
 			logger.Debug("resppayload error")
 		}
 	}
@@ -338,6 +355,7 @@ func (r *receiver) Cut() []*cb.Envelope {
 	r.invalid = make([]bool, r.maxMessageCount)
 	r.keyVersionMap = make(map[uint32]*kvrwset.Version)
 	r.keyTxMap = make(map[uint32][]int32)
+
 	return batch
 }
 
@@ -374,22 +392,35 @@ func (r *receiver) ProcessBlock() ([]*cb.Envelope, []*cb.Envelope) {
 
 		resGen := resolver.NewResolver(&graph, &invgraph)
 
-		res, _ := resGen.GetSchedule()
+		res, invSet := resGen.GetSchedule()
 		lenres := len(res)
 
 		resGen = nil
 		graph = nil
 		invgraph = nil
 
-		validBatch := make([]*cb.Envelope, lenres)
+		validBatch := make([]*cb.Envelope, r.txCounter)
 
 		for i := 0; i < lenres; i++ {
 			validBatch[i] = r.pendingBatch[res[(lenres-1)-i]]
 		}
 
-		// log some information
-		logger.Debugf("schedule-> %v", res)
-		logger.Infof("oldBlockSize:%d, newBlockSize:%d", len(r.pendingBatch), len(validBatch))
+		// Orignal implementation of fabric++ does not inform the clients of the aborted transactions,
+		// making clients waiting, here we use an naive workaround:
+		// patch the invalid transactions at the tail of the block
+		// which will not affect throughput of fabric++
+		invStart := lenres
+		for i := int32(0); i < r.txCounter; i++ {
+			if !invSet[i] {
+				continue
+			}
+			validBatch[invStart] = r.pendingBatch[i]
+			invStart++
+		}
+
+		// logger.Infof("schedule-> %v", res)
+		// logger.Infof("invStart: %d, r.txCounter: %d", invStart, r.txCounter)
+		// logger.Infof("oldBlockSize: %d, newBlockSize: %d", len(r.pendingBatch), len(validBatch))
 
 		return validBatch, nil
 	} else {
