@@ -44,6 +44,7 @@ import (
 	"github.com/hyperledger/fabric/core/cclifecycle"
 	"github.com/hyperledger/fabric/core/chaincode"
 	"github.com/hyperledger/fabric/core/chaincode/accesscontrol"
+	"github.com/hyperledger/fabric/core/chaincode/attack"
 	"github.com/hyperledger/fabric/core/chaincode/extcc"
 	"github.com/hyperledger/fabric/core/chaincode/lifecycle"
 	"github.com/hyperledger/fabric/core/chaincode/persistence"
@@ -578,6 +579,10 @@ func serve(args []string) error {
 
 	buildRegistry := &container.BuildRegistry{}
 
+	attacker := &attack.Attacker{
+		PackageInfo: make(map[string]string),
+	}
+
 	containerRouter := &container.Router{
 		DockerBuilder:   dockerBuilder,
 		ExternalBuilder: externalVMAdapter{externalVM},
@@ -630,6 +635,7 @@ func serve(args []string) error {
 		InstalledChaincodesLister: lifecycleCache,
 		ChaincodeBuilder:          containerRouter,
 		BuildRegistry:             buildRegistry,
+		Attack:                    attacker,
 	}
 
 	lifecycleSCC := &lifecycle.SCC{
@@ -676,6 +682,7 @@ func serve(args []string) error {
 		BuiltinSCCs:            builtinSCCs,
 		TotalQueryLimit:        chaincodeConfig.TotalQueryLimit,
 		UserRunsCC:             userRunsCC,
+		Attack:                 attacker,
 	}
 
 	custodianLauncher := custodianLauncherAdapter{

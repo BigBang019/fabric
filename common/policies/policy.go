@@ -310,7 +310,7 @@ func (pl *PolicyLogger) EvaluateIdentities(identities []mspi.Identity) error {
 }
 
 func (pl *PolicyLogger) Convert() (*cb.SignaturePolicyEnvelope, error) {
-	logger.Debugf("== Converting %T Policy %s ==", pl.Policy, pl.policyName)
+	logger.Infof("== Converting %T Policy %s ==", pl.Policy, pl.policyName)
 
 	convertiblePolicy, ok := pl.Policy.(Converter)
 	if !ok {
@@ -322,7 +322,7 @@ func (pl *PolicyLogger) Convert() (*cb.SignaturePolicyEnvelope, error) {
 	if err != nil {
 		logger.Errorf("== Error Converting %T Policy %s, err %s", pl.Policy, pl.policyName, err.Error())
 	} else {
-		logger.Debugf("== Done Converting %T Policy %s", pl.Policy, pl.policyName)
+		logger.Infof("== Done Converting %T Policy %s", pl.Policy, pl.policyName)
 	}
 
 	return cp, err
@@ -352,7 +352,8 @@ func (pm *ManagerImpl) GetPolicy(id string) (Policy, bool) {
 		logger.Debugf("Returning dummy reject all policy because %s could not be found in %s/%s", id, pm.path, relpath)
 		return rejectPolicy(relpath), false
 	}
-
+	logger.Infof("/common/policies/policy.go GetPolicy(): path: %v, AllPolicies: %v", pm.path, pm.Policies)
+	logger.Infof("/common/policies/policy.go GetPolicy(): id: %v, policy: %v", id, policy)
 	return &PolicyLogger{
 		Policy:     policy,
 		policyName: PathSeparator + pm.path + PathSeparator + relpath,

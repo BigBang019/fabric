@@ -92,12 +92,12 @@ func (s *service) Discover(ctx context.Context, request *discovery.SignedRequest
 		logger.Warningf("Request from %s is malformed or invalid: %v", addr, err)
 		return nil, err
 	}
-	logger.Debugf("Processing request from %s: %v", addr, req)
+	logger.Infof("Processing request from %s: %v", addr, req)
 	var res []*discovery.QueryResult
 	for _, q := range req.Queries {
 		res = append(res, s.processQuery(q, request, req.Authentication.ClientIdentity, addr))
 	}
-	logger.Debugf("Returning to %s a response containing: %v", addr, res)
+	logger.Infof("Returning to %s a response containing: %v", addr, res)
 	return &discovery.Response{
 		Results: res,
 	}, nil

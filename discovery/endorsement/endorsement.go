@@ -97,7 +97,7 @@ func (ea *endorsementAnalyzer) PeersForEndorsement(channelID common.ChannelID, i
 		logger.Warningf("Principal set computation failed: %v", err)
 		return nil, errors.WithStack(err)
 	}
-
+	logger.Info("Here's the logic of computing endorsers!!!")
 	return ea.computeEndorsementResponse(&context{
 		chaincode:           interest.Chaincodes[0].Name,
 		channel:             string(channelID),

@@ -45,6 +45,7 @@ type channelPolicyReferenceProviderImpl struct {
 func (c *channelPolicyReferenceProviderImpl) NewPolicy(channelID, channelConfigPolicyReference string) (policies.Policy, error) {
 	cc := c.GetStableChannelConfig(channelID)
 	pm := cc.PolicyManager()
+	logger.Infof("/core/chaincode/lifecycle/metadata_provider.go NewPolicy(): cc: %v", cc)
 	p, ok := pm.GetPolicy(channelConfigPolicyReference)
 	if !ok {
 		return nil, errors.Errorf("could not retrieve policy for reference '%s' on channel '%s'", channelConfigPolicyReference, channelID)
@@ -95,7 +96,7 @@ func (mp *MetadataProvider) toSignaturePolicyEnvelope(channelID string, policyBy
 		if err != nil {
 			return nil, errors.WithMessagef(err, "error converting policy with reference '%s' on channel '%s' to SignaturePolicyEnvelope", policy.ChannelConfigPolicyReference, channelID)
 		}
-
+		logger.Infof("/core/chaincode/lifecycle/metadata_provider.go toSignaturePolicyEnvelope(channelID, policyBytes): \n\t\t\tchannelID: %v, spe: %v", channelID, spe)
 		return proto.Marshal(spe)
 	default:
 		// this will only happen if a new policy type is added to the oneof
@@ -111,7 +112,7 @@ func (mp *MetadataProvider) Metadata(channel string, ccName string, collections 
 		// fallback to legacy metadata via cclifecycle
 		return mp.LegacyMetadataProvider.Metadata(channel, ccName, collections...)
 	}
-
+	logger.Infof("/core/chaincode/lifecycle/metadata_provider.go Metadata(channel, ccName, collections):\n\t\t\tchannel: %v, ccName: %v, ccInfo: %v", channel, ccName, ccInfo)
 	spe, err := mp.toSignaturePolicyEnvelope(channel, ccInfo.Definition.ValidationInfo.ValidationParameter)
 	if err != nil {
 		logger.Errorf("could not convert policy for chaincode '%s' on channel '%s', err '%s'", ccName, channel, err)
@@ -149,6 +150,7 @@ func (mp *MetadataProvider) Metadata(channel string, ccName string, collections 
 						return nil
 					}
 					ccMetadata.CollectionPolicies[collectionName] = cspe
+					logger.Infof("/core/chaincode/lifecycle/metadata_provider.go Metadata(channel, ccName, collections):\n\t\t\t CollectionName: %v, cspe: %v", collectionName, cspe)
 				}
 			}
 		}
