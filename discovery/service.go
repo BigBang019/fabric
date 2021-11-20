@@ -92,12 +92,12 @@ func (s *service) Discover(ctx context.Context, request *discovery.SignedRequest
 		logger.Warningf("Request from %s is malformed or invalid: %v", addr, err)
 		return nil, err
 	}
-	logger.Infof("Processing request from %s: %v", addr, req)
+	// logger.Infof("Processing request from %s: %v", addr, req)
 	var res []*discovery.QueryResult
 	for _, q := range req.Queries {
 		res = append(res, s.processQuery(q, request, req.Authentication.ClientIdentity, addr))
 	}
-	logger.Infof("Returning to %s a response containing: %v", addr, res)
+	// logger.Infof("Returning to %s a response containing: %v", addr, res)
 	return &discovery.Response{
 		Results: res,
 	}, nil
@@ -133,6 +133,7 @@ func (s *service) dispatch(q *discovery.Query) *discovery.QueryResult {
 }
 
 func (s *service) chaincodeQuery(q *discovery.Query) *discovery.QueryResult {
+	logger.Infof("chaincodeQuery start: %v", q)
 	if err := validateCCQuery(q.GetCcQuery()); err != nil {
 		return wrapError(err)
 	}
@@ -145,7 +146,7 @@ func (s *service) chaincodeQuery(q *discovery.Query) *discovery.QueryResult {
 		}
 		descriptors = append(descriptors, desc)
 	}
-
+	logger.Infof("chaincodeQuery end: %v", descriptors)
 	return &discovery.QueryResult{
 		Result: &discovery.QueryResult_CcQueryRes{
 			CcQueryRes: &discovery.ChaincodeQueryResult{
@@ -156,11 +157,13 @@ func (s *service) chaincodeQuery(q *discovery.Query) *discovery.QueryResult {
 }
 
 func (s *service) configQuery(q *discovery.Query) *discovery.QueryResult {
+	logger.Infof("configQuery start: %v", q)
 	conf, err := s.Config(q.Channel)
 	if err != nil {
 		logger.Errorf("Failed fetching config for channel %s: %v", q.Channel, err)
 		return wrapError(errors.Errorf("failed fetching config for channel %s", q.Channel))
 	}
+	logger.Infof("configQuery end: %v", q)
 	return &discovery.QueryResult{
 		Result: &discovery.QueryResult_ConfigResult{
 			ConfigResult: conf,
@@ -179,6 +182,7 @@ func wrapPeerResponse(peersByOrg map[string]*discovery.Peers) *discovery.QueryRe
 }
 
 func (s *service) channelMembershipResponse(q *discovery.Query) *discovery.QueryResult {
+	logger.Infof("channelMembershipResponse start: %v", q)
 	chanPeers, err := s.PeersAuthorizedByCriteria(common2.ChannelID(q.Channel), q.GetPeerQuery().Filter)
 	if err != nil {
 		return wrapError(err)
@@ -198,6 +202,7 @@ func (s *service) channelMembershipResponse(q *discovery.Query) *discovery.Query
 			membersByOrgs[org].Peers = append(membersByOrgs[org].Peers, peer)
 		}
 	}
+	logger.Infof("channelMembershipResponse end: %v", membersByOrgs)
 	return wrapPeerResponse(membersByOrgs)
 }
 

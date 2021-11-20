@@ -352,8 +352,8 @@ func (pm *ManagerImpl) GetPolicy(id string) (Policy, bool) {
 		logger.Debugf("Returning dummy reject all policy because %s could not be found in %s/%s", id, pm.path, relpath)
 		return rejectPolicy(relpath), false
 	}
-	logger.Infof("/common/policies/policy.go GetPolicy(): path: %v, AllPolicies: %v", pm.path, pm.Policies)
-	logger.Infof("/common/policies/policy.go GetPolicy(): id: %v, policy: %v", id, policy)
+	// logger.Infof("/common/policies/policy.go GetPolicy(): path: %v, AllPolicies: %v", pm.path, pm.Policies)
+	// logger.Infof("/common/policies/policy.go GetPolicy(): id: %v, policy: %v", id, policy)
 	return &PolicyLogger{
 		Policy:     policy,
 		policyName: PathSeparator + pm.path + PathSeparator + relpath,

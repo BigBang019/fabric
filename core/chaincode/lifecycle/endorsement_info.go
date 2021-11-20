@@ -106,6 +106,7 @@ func (cei *ChaincodeEndorsementInfoSource) CachedChaincodeInfo(channelID, chainc
 // ChaincodeEndorsementInfo returns the information necessary to handle a chaincode invocation request, as well as a function to
 // enforce security checks on the chaincode (in case the definition is from the legacy lscc).
 func (cei *ChaincodeEndorsementInfoSource) ChaincodeEndorsementInfo(channelID, chaincodeName string, qe ledger.SimpleQueryExecutor) (*ChaincodeEndorsementInfo, error) {
+	logger.Infof("zxyChaincodeEndorsementInfo start: %v, %v", channelID, chaincodeName)
 	if cei.BuiltinSCCs.IsSysCC(chaincodeName) {
 		return &ChaincodeEndorsementInfo{
 			Version:           scc.SysCCVersion,
@@ -139,7 +140,7 @@ func (cei *ChaincodeEndorsementInfoSource) ChaincodeEndorsementInfo(channelID, c
 	if chaincodeInfo.InstallInfo == nil {
 		chaincodeInfo.InstallInfo = &ChaincodeInstallInfo{}
 	}
-
+	logger.Infof("zxyChaincodeEndorsementInfo end: %v", chaincodeInfo)
 	return &ChaincodeEndorsementInfo{
 		Version:           chaincodeInfo.Definition.EndorsementInfo.Version,
 		EnforceInit:       chaincodeInfo.Definition.EndorsementInfo.InitRequired,

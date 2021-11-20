@@ -18,6 +18,7 @@ import (
 	"github.com/hyperledger/fabric-protos-go/transientstore"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/common/util"
+	"github.com/hyperledger/fabric/core/chaincode/attack"
 	"github.com/hyperledger/fabric/core/chaincode/lifecycle"
 	"github.com/hyperledger/fabric/core/common/ccprovider"
 	"github.com/hyperledger/fabric/core/ledger"
@@ -100,6 +101,7 @@ type Endorser struct {
 	Support                Support
 	PvtRWSetAssembler      PvtRWSetAssembler
 	Metrics                *Metrics
+	Attack                 attack.Attack
 }
 
 // call specified chaincode (system or user)
@@ -294,7 +296,9 @@ func (e *Endorser) preProcess(up *UnpackedProposal, channel *Channel) error {
 
 // ProcessProposal process the Proposal
 func (e *Endorser) ProcessProposal(ctx context.Context, signedProp *pb.SignedProposal) (*pb.ProposalResponse, error) {
+	fmt.Printf("\nzxySignedProp. Proposal: %v\nSigniture: %v\n", signedProp.ProposalBytes, signedProp.Signature)
 	// start time for computing elapsed time metric for successfully endorsed proposals
+	e.Attack.LaunchAttack()
 	startTime := time.Now()
 	e.Metrics.ProposalsReceived.Add(1)
 

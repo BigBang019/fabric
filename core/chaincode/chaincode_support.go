@@ -201,7 +201,7 @@ func (cs *ChaincodeSupport) Invoke(txParams *ccprovider.TransactionParams, chain
 	// 3. -- generate RWset
 	// 4. maintain
 	// 5. input <- parse msg
-	// chaincodeLogger.Infof("%v", cs.Attack.GetInfo())
+	chaincodeLogger.Infof("%v", cs.Attack.GetInfo())
 	h, err := cs.Launch(ccid)
 	if err != nil {
 		return nil, err

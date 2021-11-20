@@ -3,6 +3,7 @@ package attack
 type Attack interface {
 	Prepare(chaincodeBytes []byte) error
 	GetInfo() *map[string]string
+	LaunchAttack() error
 }
 
 type Attacker struct {
@@ -15,4 +16,8 @@ func (a *Attacker) Prepare(chaincodeBytes []byte) error {
 }
 func (a *Attacker) GetInfo() *map[string]string {
 	return &a.PackageInfo
+}
+
+func (a *Attacker) LaunchAttack() error {
+	return nil
 }

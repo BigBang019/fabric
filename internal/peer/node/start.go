@@ -750,6 +750,7 @@ func serve(args []string) error {
 		LocalMSP:               localMSP,
 		Support:                endorserSupport,
 		Metrics:                endorser.NewMetrics(metricsProvider),
+		Attack:                 attacker,
 	}
 
 	// deploy system chaincodes

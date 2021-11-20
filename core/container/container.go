@@ -98,6 +98,7 @@ func (r *Router) Build(ccid string) error {
 	var instance Instance
 
 	if r.ExternalBuilder != nil {
+		vmLogger.Infof("%v Building with ExternalBuilder", ccid)
 		// for now, the package ID we retrieve from the FS is always the ccid
 		// the chaincode uses for registration
 		_, mdBytes, codeStream, err := r.PackageProvider.GetChaincodePackage(ccid)
@@ -113,6 +114,7 @@ func (r *Router) Build(ccid string) error {
 	}
 
 	if instance == nil {
+		vmLogger.Infof("%v Building with DockerBuilder", ccid)
 		if r.DockerBuilder == nil {
 			return errors.New("no DockerBuilder, cannot build")
 		}

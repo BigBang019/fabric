@@ -615,6 +615,8 @@ func (t *http2Server) handleData(f *http2.DataFrame) {
 		if len(f.Data()) > 0 {
 			buffer := t.bufferPool.get()
 			buffer.Reset()
+			// Here's the logic of recving the gossip message
+			// After recving the msg, server write data into the buf
 			buffer.Write(f.Data())
 			s.write(recvMsg{buffer: buffer})
 		}
