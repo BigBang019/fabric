@@ -17,7 +17,6 @@ import (
 	po "github.com/hyperledger/fabric-protos-go/orderer"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/events/service/mocks"
-	"github.com/hyperledger/fabric-sdk-go/pkg/util/test"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -175,13 +174,13 @@ func (m *MockBroadcastServer) Start(address string) string {
 	}
 	addr := lis.Addr().String()
 
-	test.Logf("Starting MockEventServer [%s]", addr)
+	// test.Logf("Starting MockEventServer [%s]", addr)
 	po.RegisterAtomicBroadcastServer(m.srv, m)
 	m.wg.Add(1)
 	go func() {
 		defer m.wg.Done()
 		if err := m.srv.Serve(lis); err != nil {
-			test.Logf("StartMockBroadcastServer failed [%s]", err)
+			// test.Logf("StartMockBroadcastServer failed [%s]", err)
 		}
 	}()
 

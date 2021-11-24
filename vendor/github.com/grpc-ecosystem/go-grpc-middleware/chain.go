@@ -7,7 +7,6 @@ package grpc_middleware
 
 import (
 	"context"
-	"fmt"
 
 	"google.golang.org/grpc"
 )
@@ -23,7 +22,6 @@ func ChainUnaryServer(interceptors ...grpc.UnaryServerInterceptor) grpc.UnarySer
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		chainer := func(currentInter grpc.UnaryServerInterceptor, currentHandler grpc.UnaryHandler) grpc.UnaryHandler {
 			return func(currentCtx context.Context, currentReq interface{}) (interface{}, error) {
-				fmt.Printf("\n----------------------\nzxyinfo: %v\n!!!!!!!!!!!!!!!!!!!\nzxyreq: %v\n========================\n", info, currentReq)
 				return currentInter(currentCtx, currentReq, info, currentHandler)
 			}
 		}

@@ -8,6 +8,7 @@ package invoke
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/status"
@@ -45,7 +46,7 @@ func (e *EndorsementHandler) Handle(requestContext *RequestContext, clientContex
 	if e.headerOptsProvider != nil {
 		TxnHeaderOpts = e.headerOptsProvider()
 	}
-
+	fmt.Println("requestContext.Opts.Targets:", requestContext.Opts.Targets)
 	transactionProposalResponses, proposal, err := createAndSendTransactionProposal(
 		clientContext.Transactor,
 		&requestContext.Request,

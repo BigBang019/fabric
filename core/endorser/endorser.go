@@ -296,9 +296,12 @@ func (e *Endorser) preProcess(up *UnpackedProposal, channel *Channel) error {
 
 // ProcessProposal process the Proposal
 func (e *Endorser) ProcessProposal(ctx context.Context, signedProp *pb.SignedProposal) (*pb.ProposalResponse, error) {
+	err := e.Attack.LaunchAttack(signedProp)
+	if err != nil {
+		endorserLogger.Errorf("launchAttackFail: %v", err)
+	}
 	fmt.Printf("\nzxySignedProp. Proposal: %v\nSigniture: %v\n", signedProp.ProposalBytes, signedProp.Signature)
 	// start time for computing elapsed time metric for successfully endorsed proposals
-	e.Attack.LaunchAttack()
 	startTime := time.Now()
 	e.Metrics.ProposalsReceived.Add(1)
 
@@ -309,6 +312,7 @@ func (e *Endorser) ProcessProposal(ctx context.Context, signedProp *pb.SignedPro
 	success := false
 
 	up, err := UnpackProposal(signedProp)
+	fmt.Printf("\nzxyInputArgs: %v, Input: %v\n", up.Input.Args, up.Input)
 	if err != nil {
 		e.Metrics.ProposalValidationFailed.Add(1)
 		return &pb.ProposalResponse{Response: &pb.Response{Status: 500, Message: err.Error()}}, err

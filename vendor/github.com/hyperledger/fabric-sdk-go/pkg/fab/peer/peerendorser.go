@@ -154,7 +154,14 @@ func (p *peerEndorser) sendProposal(ctx reqContext.Context, proposal fab.Process
 		return nil, status.New(status.EndorserClientStatus, status.ConnectionFailed.ToInt32(), err.Error(), []interface{}{p.target})
 	}
 	defer p.releaseConn(ctx, conn)
-	fmt.Printf("\nctx: %v\nconn: %v\n\n", ctx, conn)
+
+	// endorserJSON, _ := json.MarshalIndent(p, "", " ")
+	// fmt.Printf("\nendorserJSON: %s\n", string(endorserJSON))
+
+	// ctxJSON, _ := json.MarshalIndent(ctx, "", " ")
+	// fmt.Printf("\nctx: %s\n", string(ctxJSON))
+	fmt.Printf("\n%#v\n", p)
+
 	endorserClient := pb.NewEndorserClient(conn)
 	resp, err := endorserClient.ProcessProposal(ctx, proposal.SignedProposal)
 

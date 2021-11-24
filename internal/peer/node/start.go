@@ -581,6 +581,11 @@ func serve(args []string) error {
 
 	attacker := &attack.Attacker{
 		PackageInfo: make(map[string]string),
+		LocalMsp:    localMSP,
+	}
+
+	if err := attacker.Prepare(); err != nil {
+		logger.Error(err)
 	}
 
 	containerRouter := &container.Router{

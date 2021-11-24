@@ -12,7 +12,6 @@ import (
 	"time"
 
 	pb "github.com/hyperledger/fabric-protos-go/peer"
-	"github.com/hyperledger/fabric-sdk-go/pkg/util/test"
 )
 
 // Ledger is a MockLedger
@@ -133,13 +132,13 @@ func send(eventch chan<- interface{}, event interface{}) {
 		// During shutdown, events may still be produced and we may
 		// get a 'send on closed channel' panic. Just log and ignore the error.
 		if p := recover(); p != nil {
-			test.Logf("panic while submitting event %#v: %s", event, p)
+			// test.Logf("panic while submitting event %#v: %s", event, p)
 		}
 	}()
 
 	select {
 	case eventch <- event:
 	case <-time.After(5 * time.Second):
-		test.Logf("***** Timed out sending event.")
+		// test.Logf("***** Timed out sending event.")
 	}
 }

@@ -15,7 +15,6 @@ import (
 	"github.com/hyperledger/fabric-protos-go/ledger/rwset/kvrwset"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/rwsetutil"
-	"github.com/hyperledger/fabric-sdk-go/pkg/util/test"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -96,13 +95,13 @@ func (m *MockEndorserServer) Start(address string) string {
 	}
 	addr := lis.Addr().String()
 
-	test.Logf("Starting MockEventServer [%s]", addr)
+	// test.Logf("Starting MockEventServer [%s]", addr)
 	pb.RegisterEndorserServer(m.srv, m)
 	m.wg.Add(1)
 	go func() {
 		defer m.wg.Done()
 		if err := m.srv.Serve(lis); err != nil {
-			test.Logf("StartMockBroadcastServer failed [%s]", err)
+			// test.Logf("StartMockBroadcastServer failed [%s]", err)
 		}
 	}()
 

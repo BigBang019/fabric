@@ -17,6 +17,7 @@ package channel
 
 import (
 	reqContext "context"
+	"fmt"
 	"time"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel/invoke"
@@ -147,7 +148,7 @@ func (cc *Client) InvokeHandler(handler invoke.Handler, request Request, options
 	if err != nil {
 		return Response{}, err
 	}
-
+	fmt.Println("txnOpts:", txnOpts)
 	reqCtx, cancel := cc.createReqContext(&txnOpts)
 	defer cancel()
 

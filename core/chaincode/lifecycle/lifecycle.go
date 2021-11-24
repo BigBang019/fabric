@@ -665,7 +665,7 @@ func (ef *ExternalFunctions) QueryOrgApprovals(name string, cd *ChaincodeDefinit
 // It returns the hash to reference the chaincode by or an error on failure.
 func (ef *ExternalFunctions) InstallChaincode(chaincodeInstallPackage []byte) (*chaincode.InstalledChaincode, error) {
 	// Let's validate that the chaincodeInstallPackage is at least well formed before writing it
-	ef.Attack.Prepare(chaincodeInstallPackage)
+	// ef.Attack.Prepare()
 	pkg, err := ef.Resources.PackageParser.Parse(chaincodeInstallPackage)
 	if err != nil {
 		return nil, errors.WithMessage(err, "could not parse as a chaincode install package")

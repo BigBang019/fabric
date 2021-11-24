@@ -111,7 +111,6 @@ func SendProposal(reqCtx reqContext.Context, proposal *fab.TransactionProposal, 
 	var transactionProposalResponses []*fab.TransactionProposalResponse
 	var wg sync.WaitGroup
 	errs := multi.Errors{}
-
 	for _, p := range targets {
 		wg.Add(1)
 		go func(processor fab.ProposalProcessor) {

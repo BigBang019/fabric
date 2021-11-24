@@ -8,6 +8,7 @@ package channel
 
 import (
 	reqContext "context"
+	"fmt"
 	"time"
 
 	pb "github.com/hyperledger/fabric-protos-go/peer"
@@ -86,10 +87,11 @@ func WithTargetEndpoints(keys ...string) RequestOption {
 	return func(ctx context.Client, opts *requestOptions) error {
 
 		var targets []fab.Peer
-
 		for _, url := range keys {
 
 			peerCfg, err := comm.NetworkPeerConfig(ctx.EndpointConfig(), url)
+			// cfgJSON, _ := json.MarshalIndent(peerCfg, "", " ")
+			// fmt.Printf("\n%s\n", string(cfgJSON))
 			if err != nil {
 				return err
 			}
@@ -98,7 +100,7 @@ func WithTargetEndpoints(keys ...string) RequestOption {
 			if err != nil {
 				return errors.WithMessage(err, "creating peer from config failed")
 			}
-
+			fmt.Printf("\n%+v\n", peer)
 			targets = append(targets, peer)
 		}
 

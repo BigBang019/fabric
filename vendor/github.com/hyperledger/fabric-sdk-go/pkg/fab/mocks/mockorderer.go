@@ -14,7 +14,6 @@ import (
 
 	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
-	"github.com/hyperledger/fabric-sdk-go/pkg/util/test"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -209,12 +208,12 @@ func (o *MockGrpcOrderer) Start() string {
 	}
 	addr := lis.Addr().String()
 
-	test.Logf("Starting MockGrpcOrderer [%s]", addr)
+	// test.Logf("Starting MockGrpcOrderer [%s]", addr)
 	o.wg.Add(1)
 	go func() {
 		defer o.wg.Done()
 		if err := o.srv.Serve(lis); err != nil {
-			test.Logf("Start MockGrpcOrderer failed [%s]", err)
+			// test.Logf("Start MockGrpcOrderer failed [%s]", err)
 		}
 	}()
 
@@ -227,11 +226,11 @@ func (o *MockGrpcOrderer) Stop() {
 	if o.srv == nil {
 		panic("MockGrpcOrderer not started")
 	}
-	test.Logf("Stopping MockGrpcOrderer [%s]", o.OrdererURL)
+	// test.Logf("Stopping MockGrpcOrderer [%s]", o.OrdererURL)
 	o.srv.Stop()
 	o.wg.Wait()
 	o.srv = nil
-	test.Logf("Stopped MockGrpcOrderer [%s]", o.OrdererURL)
+	// test.Logf("Stopped MockGrpcOrderer [%s]", o.OrdererURL)
 }
 
 // URL returns the URL of the mock GRPC Orderer
@@ -242,7 +241,7 @@ func (o *MockGrpcOrderer) URL() string {
 // SendBroadcast accepts client broadcast calls and attempts connection to the grpc server
 // it does not attempt to broadcast the envelope, it only tries to connect to the server
 func (o *MockGrpcOrderer) SendBroadcast(ctx reqContext.Context, envelope *fab.SignedEnvelope) (*common.Status, error) {
-	test.Logf("creating connection [%s]", o.OrdererURL)
+	// test.Logf("creating connection [%s]", o.OrdererURL)
 	var err error
 	if o.Creds != nil {
 		_, err = grpc.DialContext(ctx, o.OrdererURL, grpc.WithTransportCredentials(o.Creds))

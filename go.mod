@@ -38,13 +38,14 @@ require (
 	github.com/hyperledger/fabric-chaincode-go v0.0.0-20200128192331-2d899240a7ed
 	github.com/hyperledger/fabric-config v0.0.7
 	github.com/hyperledger/fabric-lib-go v1.0.0
-	github.com/hyperledger/fabric-protos-go v0.0.0-20200506201313-25f6564b9ac4
+	github.com/hyperledger/fabric-protos-go v0.0.0-20200707132912-fee30f3ccd23
+	github.com/hyperledger/fabric-sdk-go v1.0.0-rc1
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pretty v0.2.0
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/miekg/pkcs11 v1.0.3
-	github.com/mitchellh/mapstructure v1.2.2
+	github.com/mitchellh/mapstructure v1.3.2
 	github.com/onsi/ginkgo v1.14.0
 	github.com/onsi/gomega v1.10.1
 	github.com/opencontainers/runc v1.0.0-rc8 // indirect
@@ -56,7 +57,7 @@ require (
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5
-	github.com/spf13/viper v0.0.0-20150908122457-1967d93db724
+	github.com/spf13/viper v1.1.1
 	github.com/stretchr/testify v1.7.1-0.20210116013205-6990a05d54c2 // includes ErrorContains
 	github.com/sykesm/zap-logfmt v0.0.2
 	github.com/syndtr/goleveldb v1.0.1-0.20210305035536-64b5b1c73954
@@ -69,7 +70,7 @@ require (
 	google.golang.org/grpc v1.29.1
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
-	gopkg.in/yaml.v2 v2.2.8
+	gopkg.in/yaml.v2 v2.3.0
 )
 
 replace github.com/onsi/gomega => github.com/onsi/gomega v1.9.0
