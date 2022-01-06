@@ -41,6 +41,8 @@ func (up *UnpackedProposal) TxID() string {
 // UnpackProposal creates an an *UnpackedProposal which is guaranteed to have
 // no zero-ed fields or it returns an error.
 func UnpackProposal(signedProp *pb.SignedProposal) (*UnpackedProposal, error) {
+	endorserLogger.Info("=====================================")
+	defer endorserLogger.Info("=====================================")
 	prop, err := protoutil.UnmarshalProposal(signedProp.ProposalBytes)
 	if err != nil {
 		return nil, err
@@ -52,6 +54,11 @@ func UnpackProposal(signedProp *pb.SignedProposal) (*UnpackedProposal, error) {
 	}
 
 	chdr, err := protoutil.UnmarshalChannelHeader(hdr.ChannelHeader)
+	endorserLogger.Infof("ChannelHeader Type: %v", chdr.Type)
+	endorserLogger.Infof("ChannelHeader Version: %v", chdr.Version)
+	endorserLogger.Infof("ChannelHeader Timestamp: %v", chdr.Timestamp)
+	endorserLogger.Infof("ChannelHeader ChannelID: %v", chdr.ChannelId)
+	endorserLogger.Infof("ChannelHeader Epoch: %v", chdr.Epoch)
 	if err != nil {
 		return nil, err
 	}
@@ -62,6 +69,7 @@ func UnpackProposal(signedProp *pb.SignedProposal) (*UnpackedProposal, error) {
 	}
 
 	chaincodeHdrExt, err := protoutil.UnmarshalChaincodeHeaderExtension(chdr.Extension)
+
 	if err != nil {
 		return nil, err
 	}
@@ -73,11 +81,15 @@ func UnpackProposal(signedProp *pb.SignedProposal) (*UnpackedProposal, error) {
 	if chaincodeHdrExt.ChaincodeId.Name == "" {
 		return nil, errors.Errorf("ChaincodeHeaderExtension.ChaincodeId.Name is empty")
 	}
+	endorserLogger.Infof("ChaincodeID Path: %v", chaincodeHdrExt.ChaincodeId.Path)
+	endorserLogger.Infof("ChaincodeID Name: %v", chaincodeHdrExt.ChaincodeId.Name)
+	endorserLogger.Infof("ChaincodeID Version: %v", chaincodeHdrExt.ChaincodeId.Version)
 
 	cpp, err := protoutil.UnmarshalChaincodeProposalPayload(prop.Payload)
 	if err != nil {
 		return nil, err
 	}
+	endorserLogger.Infof("TransientMap: %v", cpp.TransientMap)
 
 	cis, err := protoutil.UnmarshalChaincodeInvocationSpec(cpp.Input)
 	if err != nil {
@@ -91,6 +103,12 @@ func UnpackProposal(signedProp *pb.SignedProposal) (*UnpackedProposal, error) {
 	if cis.ChaincodeSpec.Input == nil {
 		return nil, errors.Errorf("chaincode input did not contain any input")
 	}
+	endorserLogger.Infof("ChaincodeSpec Type: %v", cis.ChaincodeSpec.Type)
+	endorserLogger.Infof("ChaincodeSpec ChaincodeID: %v", cis.ChaincodeSpec.ChaincodeId)
+	endorserLogger.Infof("ChaincodeSpec Timeout: %v", cis.ChaincodeSpec.Timeout)
+	endorserLogger.Infof("Input arg[0]: %v", string(cis.ChaincodeSpec.Input.Args[0]))
+	endorserLogger.Infof("Input Decoration: %v", cis.ChaincodeSpec.Input.Decorations)
+	endorserLogger.Infof("Input IsInit: %v", cis.ChaincodeSpec.Input.IsInit)
 
 	cppNoTransient := &pb.ChaincodeProposalPayload{Input: cpp.Input, TransientMap: nil}
 	ppBytes, err := proto.Marshal(cppNoTransient)

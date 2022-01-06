@@ -73,9 +73,11 @@ func (s *txSimulator) DeleteStateMetadata(namespace, key string) error {
 // SetPrivateData implements method in interface `ledger.TxSimulator`
 func (s *txSimulator) SetPrivateData(ns, coll, key string, value []byte) error {
 	if err := s.queryExecutor.validateCollName(ns, coll); err != nil {
+		logger.Infof("zxyError1: %v", err)
 		return err
 	}
 	if err := s.checkWritePrecondition(key, value); err != nil {
+		logger.Infof("zxyError2: %v", err)
 		return err
 	}
 	s.writePerformed = true

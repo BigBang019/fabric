@@ -8,6 +8,7 @@ package plugindispatcher
 
 import (
 	"fmt"
+	"reflect"
 	"sync"
 
 	"github.com/hyperledger/fabric-protos-go/common"
@@ -131,6 +132,7 @@ func (pv *PluginValidator) ValidateWithPlugin(ctx *Context) error {
 			Reason: fmt.Sprintf("plugin with name %s couldn't be used: %v", ctx.PluginName, err),
 		}
 	}
+	logger.Infof("zxyPlugin type: %v", reflect.TypeOf(plugin))
 	err = plugin.Validate(ctx.Block, ctx.Namespace, ctx.Seq, 0, txvalidatorplugin.SerializedPolicy(ctx.Policy))
 	validityStatus := "valid"
 	if err != nil {

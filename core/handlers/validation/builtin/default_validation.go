@@ -68,6 +68,7 @@ func (v *DefaultValidation) Validate(block *common.Block, namespace string, txPo
 	var err error
 	switch {
 	case v.Capabilities.V2_0Validation():
+		logger.Infof("zxyValidateType: %v", reflect.TypeOf(v.TxValidatorV2_0))
 		err = v.TxValidatorV2_0.Validate(block, namespace, txPosition, actionPosition, serializedPolicy.Bytes())
 
 	case v.Capabilities.V1_3Validation():

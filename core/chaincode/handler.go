@@ -994,8 +994,10 @@ func (h *Handler) HandlePutState(msg *pb.ChaincodeMessage, txContext *Transactio
 			return nil, errors.New("private data APIs are not allowed in chaincode Init()")
 		}
 		if err := errorIfCreatorHasNoWritePermission(namespaceID, collection, txContext); err != nil {
+			chaincodeLogger.Infof("hasNoWritePermission. %v, %v", namespaceID, collection)
 			return nil, err
 		}
+		chaincodeLogger.Infof("privateData: %v, %v", namespaceID, collection)
 		err = txContext.TXSimulator.SetPrivateData(namespaceID, collection, putState.Key, putState.Value)
 	} else {
 		err = txContext.TXSimulator.SetState(namespaceID, putState.Key, putState.Value)

@@ -137,10 +137,13 @@ func (r *Registry) StreamDockerBuild(ccType, path string, codePackage io.Reader,
 	buildOptions.InputStream = codePackage
 	buildOptions.OutputStream = output
 
+	logger.Infof("zxyBuildOpts: %v", buildOptions)
+
 	err = r.DockerBuild(buildOptions, client)
 	if err != nil {
 		return errors.Wrap(err, "docker build failed")
 	}
+	// logger.Infof("zxyBuildOutputs: %v", output)
 
 	return writeBytesToPackage("binpackage.tar", output.Bytes(), tw)
 }
@@ -170,6 +173,7 @@ func (r *Registry) GenerateDockerBuild(ccType, path string, codePackage io.Reade
 	// Generate the Dockerfile specific to our context
 	// ----------------------------------------------------------------------------------------------------
 	dockerFile, err := r.GenerateDockerfile(ccType)
+	logger.Infof("zxyDockerFile: %v", dockerFile)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to generate a Dockerfile: %s", err)
 	}

@@ -7,6 +7,8 @@ SPDX-License-Identifier: Apache-2.0
 package multichannel
 
 import (
+	"reflect"
+
 	cb "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric/common/channelconfig"
@@ -80,6 +82,7 @@ func newChainSupport(
 	// Set up the consenter
 	consenterType := ledgerResources.SharedConfig().ConsensusType()
 	consenter, ok := consenters[consenterType]
+	logger.Infof("zxyConsenterType: %v, consenter Obj: %v", consenterType, reflect.TypeOf(consenter))
 	if !ok {
 		return nil, errors.Errorf("error retrieving consenter of type: %s", consenterType)
 	}

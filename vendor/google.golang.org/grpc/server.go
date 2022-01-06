@@ -923,8 +923,6 @@ func getChainUnaryHandler(interceptors []UnaryServerInterceptor, curr int, info 
 }
 
 func (s *Server) processUnaryRPC(t transport.ServerTransport, stream *transport.Stream, srv *service, md *MethodDesc, trInfo *traceInfo) (err error) {
-	// Here's the logic of processing unary RPC from client
-	fmt.Printf("\nzxyprocessUnaryRPC starts. method: %v, service: %v\n", md, srv)
 	sh := s.opts.statsHandler
 	if sh != nil || trInfo != nil || channelz.IsOn() {
 		if channelz.IsOn() {

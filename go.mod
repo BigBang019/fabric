@@ -13,7 +13,6 @@ require (
 	github.com/Shopify/sarama v1.20.1
 	github.com/Shopify/toxiproxy v2.1.4+incompatible // indirect
 	github.com/VictoriaMetrics/fastcache v1.5.7
-	github.com/VividCortex/gohistogram v1.0.0 // indirect
 	github.com/containerd/continuity v0.0.0-20190426062206-aaeac12a7ffc // indirect
 	github.com/coreos/go-systemd v0.0.0-20190620071333-e64a0ec8b42a // indirect
 	github.com/coreos/pkg v0.0.0-20180108230652-97fdf19511ea // indirect
@@ -39,6 +38,7 @@ require (
 	github.com/hyperledger/fabric-config v0.0.7
 	github.com/hyperledger/fabric-lib-go v1.0.0
 	github.com/hyperledger/fabric-protos-go v0.0.0-20200506201313-25f6564b9ac4
+	github.com/hyperledger/fabric-sdk-go v1.0.0-beta2
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pretty v0.2.0
 	github.com/magiconair/properties v1.8.1 // indirect
@@ -56,7 +56,7 @@ require (
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5
-	github.com/spf13/viper v0.0.0-20150908122457-1967d93db724
+	github.com/spf13/viper v1.0.2
 	github.com/stretchr/testify v1.7.1-0.20210116013205-6990a05d54c2 // includes ErrorContains
 	github.com/sykesm/zap-logfmt v0.0.2
 	github.com/syndtr/goleveldb v1.0.1-0.20210305035536-64b5b1c73954

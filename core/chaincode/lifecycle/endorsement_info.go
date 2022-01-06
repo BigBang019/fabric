@@ -140,7 +140,7 @@ func (cei *ChaincodeEndorsementInfoSource) ChaincodeEndorsementInfo(channelID, c
 	if chaincodeInfo.InstallInfo == nil {
 		chaincodeInfo.InstallInfo = &ChaincodeInstallInfo{}
 	}
-	logger.Infof("zxyChaincodeEndorsementInfo end: %v", chaincodeInfo)
+	logger.Infof("zxyChaincodeEndorsementInfo end: packageID %v", chaincodeInfo.InstallInfo.PackageID)
 	return &ChaincodeEndorsementInfo{
 		Version:           chaincodeInfo.Definition.EndorsementInfo.Version,
 		EnforceInit:       chaincodeInfo.Definition.EndorsementInfo.InitRequired,

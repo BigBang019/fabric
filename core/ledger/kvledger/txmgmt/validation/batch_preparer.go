@@ -8,10 +8,13 @@ package validation
 
 import (
 	"bytes"
+	"fmt"
+	"os"
 
 	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric-protos-go/ledger/rwset"
 	"github.com/hyperledger/fabric-protos-go/peer"
+	"github.com/hyperledger/fabric-sdk-go/pkg/util/protolator"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/core/ledger"
 	"github.com/hyperledger/fabric/core/ledger/internal/version"
@@ -101,6 +104,44 @@ func (p *CommitBatchPreparer) ValidateAndPrepareBatch(blockAndPvtdata *ledger.Bl
 	); err != nil {
 		return nil, nil, err
 	}
+	// #################################################################
+	res := ""
+	for chaincode, updates := range pubAndHashUpdates.publicUpdates.Updates {
+		res += fmt.Sprintf("%v: {\n", chaincode)
+		for key, value := range updates.M {
+			res += fmt.Sprintf("\t%v: {\n\t\tValue: %v\n\t\tMetadata: %v\n\t\tHeight: %v\n\t }\n", key, string(value.Value[:]), string(value.Metadata[:]), value.Version)
+		}
+		res += "}\n"
+	}
+	logger.Infof("zxyMVCC. Updates: %v", res)
+	res = ""
+	for chaincode, nsBatch := range pubAndHashUpdates.hashUpdates.UpdateMap {
+		res += fmt.Sprintf("%v: {\n", chaincode)
+		for cc, updates := range nsBatch.Updates {
+			res += fmt.Sprintf("\t%v: {\n", cc)
+			for key, value := range updates.M {
+				res += fmt.Sprintf("\t\t%v: {\n\t\t\tValue: %v\n\t\t\tMetadata: %v\n\t\t\tHeight: %v\n\t\t }\n", key, string(value.Value[:]), string(value.Metadata[:]), value.Version)
+			}
+			res += "\t}\n"
+		}
+		res += "}\n"
+	}
+	logger.Infof("zxyMVCC. HashUpdates: %v", res)
+	res = ""
+	for chaincode, nsBatch := range pvtUpdates.UpdateMap {
+		res += fmt.Sprintf("%v: {\n", chaincode)
+		for cc, updates := range nsBatch.Updates {
+			res += fmt.Sprintf("\t%v: {\n", cc)
+			for key, value := range updates.M {
+				res += fmt.Sprintf("\t\t%v: {\n\t\t\tValue: %v\n\t\t\tMetadata: %v\n\t\t\tHeight: %v\n\t\t }\n", key, string(value.Value[:]), string(value.Metadata[:]), value.Version)
+			}
+			res += "\t}\n"
+		}
+		res += "}\n"
+	}
+	logger.Infof("zxyMVCC. pvtUpdates: %v", res)
+	// #################################################################
+
 	logger.Debug("postprocessing ProtoBlock...")
 	postprocessProtoBlock(blk, internalBlock)
 	logger.Debug("ValidateAndPrepareBatch() complete")
@@ -187,6 +228,12 @@ func validatePvtdata(tx *transaction, pvtdata *ledger.TxPvtData) error {
 	return nil
 }
 
+func ParseBlock(block *common.Block) {
+	if err := protolator.DeepMarshalJSON(os.Stdout, block); err != nil {
+		logger.Error(err)
+	}
+}
+
 // preprocessProtoBlock parses the proto instance of block into 'Block' structure.
 // The returned 'Block' structure contains only transactions that are endorser transactions and are not already marked as invalid
 func preprocessProtoBlock(postOrderSimulatorProvider PostOrderSimulatorProvider,
@@ -235,10 +282,18 @@ func preprocessProtoBlock(postOrderSimulatorProvider PostOrderSimulatorProvider,
 				continue
 			}
 			txStatInfo.ChaincodeID = respPayload.ChaincodeId
+			// logger.Infof("zxyValidating: ")
+			// ParseBlock(blk)
 			txRWSet = &rwsetutil.TxRwSet{}
 			if err = txRWSet.FromProtoBytes(respPayload.Results); err != nil {
 				txsFilter.SetFlag(txIndex, peer.TxValidationCode_INVALID_OTHER_REASON)
 				continue
+			}
+			for _, nsTxRwSet := range txRWSet.NsRwSets {
+				logger.Infof("zxyRwSet. Namespace: %v, keyValue: %v", nsTxRwSet.NameSpace, nsTxRwSet.KvRwSet)
+				for _, colRwSet := range nsTxRwSet.CollHashedRwSets {
+					logger.Infof("zxyCollectionRwSet. Namespace: %v, HashedRwSet: %v, PvtRwSetHash: %v", colRwSet.CollectionName, colRwSet.HashedRwSet, colRwSet.PvtRwSetHash)
+				}
 			}
 		} else {
 			rwsetProto, err := processNonEndorserTx(

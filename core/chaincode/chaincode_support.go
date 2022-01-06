@@ -80,6 +80,7 @@ type ChaincodeSupport struct {
 // error. If the chaincode is already running, it simply returns.
 func (cs *ChaincodeSupport) Launch(ccid string) (*Handler, error) {
 	if h := cs.HandlerRegistry.Handler(ccid); h != nil {
+		chaincodeLogger.Infof("zxyFoundChaincode: %v", ccid)
 		return h, nil
 	}
 
@@ -201,7 +202,7 @@ func (cs *ChaincodeSupport) Invoke(txParams *ccprovider.TransactionParams, chain
 	// 3. -- generate RWset
 	// 4. maintain
 	// 5. input <- parse msg
-	chaincodeLogger.Infof("%v", cs.Attack.GetInfo())
+	// chaincodeLogger.Infof("%v", cs.Attack.GetInfo())
 	h, err := cs.Launch(ccid)
 	if err != nil {
 		return nil, err

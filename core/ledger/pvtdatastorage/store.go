@@ -217,6 +217,7 @@ func (s *Store) Commit(blockNum uint64, pvtData []*ledger.TxPvtData, missingPvtD
 	var key, val []byte
 
 	storeEntries, err := prepareStoreEntries(blockNum, pvtData, s.btlPolicy, missingPvtData)
+	logger.Infof("zxyStoreEntries: %v", storeEntries)
 	if err != nil {
 		return err
 	}
@@ -258,6 +259,7 @@ func (s *Store) Commit(blockNum uint64, pvtData []*ledger.TxPvtData, missingPvtD
 	committingBlockNum := s.nextBlockNum()
 	logger.Debugf("Committing private data for block [%d]", committingBlockNum)
 	batch.Put(lastCommittedBlkkey, encodeLastCommittedBlockVal(committingBlockNum))
+	logger.Infof("zxyBatch: %v", batch)
 	if err := s.db.WriteBatch(batch, true); err != nil {
 		return err
 	}

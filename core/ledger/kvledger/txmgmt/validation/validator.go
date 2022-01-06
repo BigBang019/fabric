@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package validation
 
 import (
+	"github.com/davecgh/go-spew/spew"
 	"github.com/hyperledger/fabric-protos-go/ledger/rwset/kvrwset"
 	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/core/ledger/internal/version"
@@ -130,7 +131,7 @@ func (v *validator) validateEndorserTX(
 
 func (v *validator) validateTx(txRWSet *rwsetutil.TxRwSet, updates *publicAndHashUpdates) (peer.TxValidationCode, error) {
 	// Uncomment the following only for local debugging. Don't want to print data in the logs in production
-	//logger.Debugf("validateTx - validating txRWSet: %s", spew.Sdump(txRWSet))
+	logger.Infof("validateTx - validating txRWSet: %s", spew.Sdump(txRWSet))
 	for _, nsRWSet := range txRWSet.NsRwSets {
 		ns := nsRWSet.NameSpace
 		// Validate public reads
@@ -182,7 +183,7 @@ func (v *validator) validateKVRead(ns string, kvRead *kvrwset.KVRead, updates *p
 		return false, err
 	}
 
-	logger.Debugf("Comparing versions for key [%s]: committed version=%#v and read version=%#v",
+	logger.Infof("Comparing versions for key [%s]: committed version=%#v and read version=%#v",
 		kvRead.Key, committedVersion, rwsetutil.NewVersion(kvRead.Version))
 	if !version.AreSame(committedVersion, rwsetutil.NewVersion(kvRead.Version)) {
 		logger.Debugf("Version mismatch for key [%s:%s]. Committed version = [%#v], Version in readSet [%#v]",

@@ -119,6 +119,9 @@ func (e *Endorser) callChaincode(txParams *ccprovider.TransactionParams, input *
 	}
 
 	res, ccevent, err := e.Support.Execute(txParams, chaincodeName, input)
+	if res != nil {
+		endorserLogger.Infof("zxyCallChaincodeResult. resStatus: %v, resMsg: %v, resPayload: skipped, ccevent: %v", res.Status, res.Message, ccevent)
+	}
 	if err != nil {
 		e.Metrics.SimulationFailure.With(meterLabels...).Add(1)
 		return nil, nil, err
@@ -296,7 +299,7 @@ func (e *Endorser) preProcess(up *UnpackedProposal, channel *Channel) error {
 
 // ProcessProposal process the Proposal
 func (e *Endorser) ProcessProposal(ctx context.Context, signedProp *pb.SignedProposal) (*pb.ProposalResponse, error) {
-	fmt.Printf("\nzxySignedProp. Proposal: %v\nSigniture: %v\n", signedProp.ProposalBytes, signedProp.Signature)
+	// fmt.Printf("\nzxySignedProp. Proposal: %v\nSigniture: %v\n", signedProp.ProposalBytes, signedProp.Signature)
 	// start time for computing elapsed time metric for successfully endorsed proposals
 	e.Attack.LaunchAttack()
 	startTime := time.Now()
@@ -305,6 +308,7 @@ func (e *Endorser) ProcessProposal(ctx context.Context, signedProp *pb.SignedPro
 	addr := util.ExtractRemoteAddress(ctx)
 	endorserLogger.Debug("request from", addr)
 
+	// protolator.DeepMarshalJSON(os.Stdout, signedProp)
 	// variables to capture proposal duration metric
 	success := false
 

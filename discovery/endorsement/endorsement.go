@@ -93,6 +93,7 @@ func (ea *endorsementAnalyzer) PeersForEndorsement(channelID common.ChannelID, i
 	// Compute a mapping between the PKI-IDs of members to their identities
 	identitiesOfMembers := computeIdentitiesOfMembers(ea.IdentityInfo(), membersById)
 	principalsSets, err := ea.computePrincipalSets(channelID, interest)
+	logger.Infof("zxyPrincipalSets. %v", principalsSets)
 	if err != nil {
 		logger.Warningf("Principal set computation failed: %v", err)
 		return nil, errors.WithStack(err)
@@ -161,6 +162,7 @@ func (ea *endorsementAnalyzer) computeEndorsementResponse(ctx *context) (*discov
 	// mapPrincipalsToGroups returns a mapping from principals to their corresponding groups.
 	// groups are just human readable representations that mask the principals behind them
 	principalGroups := mapPrincipalsToGroups(ctx.principalsSets)
+	logger.Infof("zxyGroup: %v", principalGroups)
 	// principalsToPeersGraph computes a bipartite graph (V1 U V2 , E)
 	// such that V1 is the peers, V2 are the principals,
 	// and each e=(peer,principal) is in E if the peer satisfies the principal
@@ -170,6 +172,7 @@ func (ea *endorsementAnalyzer) computeEndorsementResponse(ctx *context) (*discov
 	}, ea.satisfiesPrincipal(ctx.channel, ctx.identitiesOfMembers))
 
 	layouts := computeLayouts(ctx.principalsSets, principalGroups, satGraph)
+	logger.Infof("zxyLayouts: %v", layouts)
 	if len(layouts) == 0 {
 		return nil, errors.New("no peer combination can satisfy the endorsement policy")
 	}
@@ -403,6 +406,7 @@ func endorsersByGroup(criteria *peerMembershipCriteria) map[string]*discovery.Pe
 			// Check if this peer has the chaincode installed
 			stateInfo := chanMemberById[string(member.PKIid)]
 			_, hasChaincodeInstalled := criteria.chaincodeMapping[string(stateInfo.PKIid)]
+			// logger.Infof("zxyHashChaincodeInstalled. %v: %v", stateInfo, hasChaincodeInstalled)
 			if !hasChaincodeInstalled {
 				continue
 			}
@@ -415,6 +419,7 @@ func endorsersByGroup(criteria *peerMembershipCriteria) map[string]*discovery.Pe
 
 		if len(peerList.Peers) > 0 {
 			res[grp] = peerList
+			logger.Infof("%v computed (%v) peerList: %v", grp, len(peerList.Peers), peerList)
 		}
 	}
 	return res

@@ -107,6 +107,7 @@ func (s *Serializer) SerializableChecks(structure interface{}) (reflect.Value, [
 // Note: If a key already exists for the field, and the value is unchanged, then
 // the key is _not_ written to.
 func (s *Serializer) Serialize(namespace, name string, structure interface{}, state ReadWritableState) error {
+	logger.Infof("zxySerialize. Statetype: %v", reflect.TypeOf(state))
 	value, allFields, err := s.SerializableChecks(structure)
 	if err != nil {
 		return errors.WithMessagef(err, "structure for namespace %s/%s is not serializable", namespace, name)

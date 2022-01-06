@@ -353,7 +353,7 @@ func (ef *ExternalFunctions) CommitChaincodeDefinition(chname, ccname string, cd
 	if err != nil {
 		return nil, err
 	}
-
+	logger.Infof("zxyChaincodeDef. %v", cd)
 	if err = ef.Resources.Serializer.Serialize(NamespacesName, ccname, cd, publicState); err != nil {
 		return nil, errors.WithMessage(err, "could not serialize chaincode definition")
 	}

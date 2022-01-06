@@ -8,6 +8,7 @@ package broadcast
 
 import (
 	"io"
+	"reflect"
 	"time"
 
 	cb "github.com/hyperledger/fabric-protos-go/common"
@@ -134,6 +135,7 @@ func (mt *MetricsTracker) BeginEnqueue() {
 
 // ProcessMessage validates and enqueues a single message
 func (bh *Handler) ProcessMessage(msg *cb.Envelope, addr string) (resp *ab.BroadcastResponse) {
+	logger.Infof("zxyEnvelope: %v", msg)
 	tracker := &MetricsTracker{
 		ChannelID: "unknown",
 		TxType:    "unknown",
@@ -172,7 +174,7 @@ func (bh *Handler) ProcessMessage(msg *cb.Envelope, addr string) (resp *ab.Broad
 			logger.Warningf("[channel: %s] Rejecting broadcast of message from %s with SERVICE_UNAVAILABLE: rejected by Consenter: %s", chdr.ChannelId, addr, err)
 			return &ab.BroadcastResponse{Status: cb.Status_SERVICE_UNAVAILABLE, Info: err.Error()}
 		}
-
+		logger.Infof("zxyProcessor type: %v", reflect.TypeOf(processor))
 		err = processor.Order(msg, configSeq)
 		if err != nil {
 			logger.Warningf("[channel: %s] Rejecting broadcast of normal message from %s with SERVICE_UNAVAILABLE: rejected by Order: %s", chdr.ChannelId, addr, err)

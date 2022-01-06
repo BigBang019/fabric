@@ -283,6 +283,7 @@ func (lscc *SCC) ChaincodeEndorsementInfo(channelID, chaincodeName string, qe le
 
 	chaincodeData := &ccprovider.ChaincodeData{}
 	err = proto.Unmarshal(chaincodeDataBytes, chaincodeData)
+	logger.Infof("zxyLsccChaincodeData: %v", chaincodeData)
 	if err != nil {
 		return nil, errors.Wrapf(err, "chaincode %s has bad definition", chaincodeName)
 	}

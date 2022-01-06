@@ -799,7 +799,7 @@ func (s *GossipStateProviderImpl) straggler(currHeight uint64, receivedPayload *
 func (s *GossipStateProviderImpl) commitBlock(block *common.Block, pvtData util.PvtDataCollections) error {
 
 	t1 := time.Now()
-
+	s.logger.Infof("zxyPrivateData: %v", pvtData)
 	// Commit block with available private transactions
 	if err := s.ledger.StoreBlock(block, pvtData); err != nil {
 		s.logger.Errorf("Got error while committing(%+v)", errors.WithStack(err))

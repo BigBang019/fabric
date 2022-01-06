@@ -545,6 +545,7 @@ func (l *kvLedger) commitToPvtAndBlockStore(blockAndPvtdata *ledger.BlockAndPvtD
 		// too in the pvtdataStore as we do for the publicdata in the case of blockStore.
 		// Hence, we pass all pvtData present in the block to the pvtdataStore committer.
 		pvtData, missingPvtData := constructPvtDataAndMissingData(blockAndPvtdata)
+		logger.Infof("zxyConstructedData: %v\nzxyMissingPvtData: %v", pvtData, missingPvtData)
 		if err := l.pvtdataStore.Commit(blockNum, pvtData, missingPvtData); err != nil {
 			return err
 		}
