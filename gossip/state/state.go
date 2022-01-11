@@ -8,11 +8,14 @@ package state
 
 import (
 	"bytes"
+	"fmt"
+	"os"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	pb "github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-config/protolator"
 	"github.com/hyperledger/fabric-protos-go/common"
 	proto "github.com/hyperledger/fabric-protos-go/gossip"
 	"github.com/hyperledger/fabric-protos-go/ledger/rwset"
@@ -797,7 +800,15 @@ func (s *GossipStateProviderImpl) straggler(currHeight uint64, receivedPayload *
 }
 
 func (s *GossipStateProviderImpl) commitBlock(block *common.Block, pvtData util.PvtDataCollections) error {
-
+	no := block.Header.Number
+	f, err := os.OpenFile(fmt.Sprintf("/opt/gopath/src/github.com/hyperledger/fabric/peer/%v.json", no), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	err = protolator.DeepMarshalJSON(f, block)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 	t1 := time.Now()
 	s.logger.Infof("zxyPrivateData: %v", pvtData)
 	// Commit block with available private transactions

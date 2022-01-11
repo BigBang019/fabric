@@ -83,6 +83,7 @@ func computePolicyTree(v *graph.TreeVertex) {
 	sigPol := v.Data.(*common.SignaturePolicy)
 	if p := sigPol.GetNOutOf(); p != nil {
 		v.Threshold = int(p.N)
+		logger.Infof("sigPol for vertex %v: %v(threshold: %v)", v.Id, sigPol, v.Threshold)
 		for i, rule := range p.Rules {
 			id := fmt.Sprintf("%s.%d", v.Id, i)
 			u := v.AddDescendant(graph.NewTreeVertex(id, rule))

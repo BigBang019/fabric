@@ -122,6 +122,12 @@ func (s *SupportImpl) Execute(txParams *ccprovider.TransactionParams, name strin
 	input.Decorations = make(map[string][]byte)
 	input = decoration.Apply(txParams.Proposal, input, decorators...)
 	txParams.ProposalDecorations = input.Decorations
+	res := "{\n"
+	for k, v := range input.Decorations {
+		res += fmt.Sprintf("\t\t%v: %v\n", k, string(v[:]))
+	}
+	res += "}"
+	endorserLogger.Infof("zxyDecorations: %v", res)
 
 	return s.ChaincodeSupport.Execute(txParams, name, input)
 }

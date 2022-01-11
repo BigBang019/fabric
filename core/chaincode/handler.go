@@ -611,8 +611,10 @@ func (h *Handler) HandleGetState(msg *pb.ChaincodeMessage, txContext *Transactio
 			return nil, err
 		}
 		res, err = txContext.TXSimulator.GetPrivateData(namespaceID, collection, getState.Key)
+		chaincodeLogger.Infof("GetPrivateData: %v, %v, %v, %v", namespaceID, collection, getState.Key, string(res[:]))
 	} else {
 		res, err = txContext.TXSimulator.GetState(namespaceID, getState.Key)
+		chaincodeLogger.Infof("GetState: %v, %v, %v", namespaceID, getState.Key, string(res[:]))
 	}
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -639,6 +641,7 @@ func (h *Handler) HandleGetPrivateDataHash(msg *pb.ChaincodeMessage, txContext *
 	if txContext.IsInitTransaction {
 		return nil, errors.New("private data APIs are not allowed in chaincode Init()")
 	}
+	chaincodeLogger.Infof("GetPrivateDataHash: %v, %v, %v", namespaceID, collection, getState.Key)
 	res, err = txContext.TXSimulator.GetPrivateDataHash(namespaceID, collection, getState.Key)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -997,9 +1000,10 @@ func (h *Handler) HandlePutState(msg *pb.ChaincodeMessage, txContext *Transactio
 			chaincodeLogger.Infof("hasNoWritePermission. %v, %v", namespaceID, collection)
 			return nil, err
 		}
-		chaincodeLogger.Infof("privateData: %v, %v", namespaceID, collection)
+		chaincodeLogger.Infof("SetPrivateData: %v, %v, %v, %v", namespaceID, collection, putState.Key, string(putState.Value))
 		err = txContext.TXSimulator.SetPrivateData(namespaceID, collection, putState.Key, putState.Value)
 	} else {
+		chaincodeLogger.Infof("SetState: %v, %v, %v", namespaceID, putState.Key, string(putState.Value))
 		err = txContext.TXSimulator.SetState(namespaceID, putState.Key, putState.Value)
 	}
 	if err != nil {

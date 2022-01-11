@@ -58,6 +58,7 @@ func UnpackProposal(signedProp *pb.SignedProposal) (*UnpackedProposal, error) {
 	endorserLogger.Infof("ChannelHeader Version: %v", chdr.Version)
 	endorserLogger.Infof("ChannelHeader Timestamp: %v", chdr.Timestamp)
 	endorserLogger.Infof("ChannelHeader ChannelID: %v", chdr.ChannelId)
+	endorserLogger.Infof("ChannelHeader TxID: %v", chdr.TxId)
 	endorserLogger.Infof("ChannelHeader Epoch: %v", chdr.Epoch)
 	if err != nil {
 		return nil, err
@@ -67,6 +68,8 @@ func UnpackProposal(signedProp *pb.SignedProposal) (*UnpackedProposal, error) {
 	if err != nil {
 		return nil, err
 	}
+	endorserLogger.Infof("SignatureHeader Nonce: %v", shdr.Nonce)
+	endorserLogger.Infof("SignatureHeader Creator: %v", shdr.Creator)
 
 	chaincodeHdrExt, err := protoutil.UnmarshalChaincodeHeaderExtension(chdr.Extension)
 

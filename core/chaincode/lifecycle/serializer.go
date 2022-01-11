@@ -107,7 +107,9 @@ func (s *Serializer) SerializableChecks(structure interface{}) (reflect.Value, [
 // Note: If a key already exists for the field, and the value is unchanged, then
 // the key is _not_ written to.
 func (s *Serializer) Serialize(namespace, name string, structure interface{}, state ReadWritableState) error {
-	logger.Infof("zxySerialize. Statetype: %v", reflect.TypeOf(state))
+	logger.Infof("---------------------------------")
+	defer logger.Infof("---------------------------------")
+	logger.Infof("zxySerialize. Statetype: %v, marshalerType: %v", reflect.TypeOf(state), reflect.TypeOf(s.Marshaler))
 	value, allFields, err := s.SerializableChecks(structure)
 	if err != nil {
 		return errors.WithMessagef(err, "structure for namespace %s/%s is not serializable", namespace, name)
@@ -223,6 +225,9 @@ func (s *Serializer) IsMetadataSerialized(namespace, name string, structure inte
 // IsSerialized essentially checks if the hashes of a serialized version of a structure matches the hashes
 // of the pre-image of some struct serialized into the database.
 func (s *Serializer) IsSerialized(namespace, name string, structure interface{}, state OpaqueState) (bool, error) {
+	logger.Infof("---------------------------------")
+	defer logger.Infof("---------------------------------")
+	logger.Infof("zxyIsSerialized. Statetype: %v, collectionName: %v, marshalerType: %v", reflect.TypeOf(state), state.CollectionName(), reflect.TypeOf(s.Marshaler))
 	value, allFields, err := s.SerializableChecks(structure)
 	if err != nil {
 		return false, errors.WithMessagef(err, "structure for namespace %s/%s is not serializable", namespace, name)
@@ -237,6 +242,7 @@ func (s *Serializer) IsSerialized(namespace, name string, structure interface{},
 	existingKeys := map[string][]byte{}
 	for _, fqKey := range fqKeys {
 		value, err := state.GetStateHash(fqKey)
+		logger.Infof("%v: %v", fqKey, string(value[:]))
 		if err != nil {
 			return false, errors.WithMessagef(err, "could not get value for key %s", fqKey)
 		}

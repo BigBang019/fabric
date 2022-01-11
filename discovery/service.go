@@ -146,7 +146,20 @@ func (s *service) chaincodeQuery(q *discovery.Query) *discovery.QueryResult {
 		}
 		descriptors = append(descriptors, desc)
 	}
-	logger.Infof("chaincodeQuery end: %v", descriptors)
+	res := "[\n"
+	for _, descriptor := range descriptors {
+		res += "{\n\tEndorsersByGroups:{\n"
+		for key, value := range descriptor.EndorsersByGroups {
+			res += fmt.Sprintf("\t\t%v: %v\n", key, value)
+		}
+		res += "\t},\nLayouts:[\n"
+		for _, layout := range descriptor.Layouts {
+			res += fmt.Sprintf("\t\t%v", layout)
+		}
+		res += "\t]"
+	}
+	res += "]"
+	logger.Infof("chaincodeQuery end: %v", res)
 	return &discovery.QueryResult{
 		Result: &discovery.QueryResult_CcQueryRes{
 			CcQueryRes: &discovery.ChaincodeQueryResult{
