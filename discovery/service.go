@@ -149,13 +149,15 @@ func (s *service) chaincodeQuery(q *discovery.Query) *discovery.QueryResult {
 	res := "[\n"
 	for _, descriptor := range descriptors {
 		res += "{\n\tEndorsersByGroups:{\n"
-		for key, value := range descriptor.EndorsersByGroups {
-			res += fmt.Sprintf("\t\t%v: %v\n", key, value)
-		}
-		res += "\t},\nLayouts:[\n"
-		for _, layout := range descriptor.Layouts {
-			res += fmt.Sprintf("\t\t%v", layout)
-		}
+		res += fmt.Sprintf("With number %v\n", len(descriptor.EndorsersByGroups))
+		// for key, value := range descriptor.EndorsersByGroups {
+		// 	res += fmt.Sprintf("\t\t%v: %v\n", key, value)
+		// }
+		res += "\t},\nLayouts:["
+		res += fmt.Sprintf("With number %v\n", len(descriptor.Layouts))
+		// for _, layout := range descriptor.Layouts {
+		// 	res += fmt.Sprintf("\t\t%v", layout)
+		// }
 		res += "\t]"
 	}
 	res += "]"
@@ -195,7 +197,7 @@ func wrapPeerResponse(peersByOrg map[string]*discovery.Peers) *discovery.QueryRe
 }
 
 func (s *service) channelMembershipResponse(q *discovery.Query) *discovery.QueryResult {
-	logger.Infof("channelMembershipResponse start: %v", q)
+	// logger.Infof("channelMembershipResponse start: %v", q)
 	chanPeers, err := s.PeersAuthorizedByCriteria(common2.ChannelID(q.Channel), q.GetPeerQuery().Filter)
 	if err != nil {
 		return wrapError(err)
@@ -215,7 +217,7 @@ func (s *service) channelMembershipResponse(q *discovery.Query) *discovery.Query
 			membersByOrgs[org].Peers = append(membersByOrgs[org].Peers, peer)
 		}
 	}
-	logger.Infof("channelMembershipResponse end: %v", membersByOrgs)
+	// logger.Infof("channelMembershipResponse end: %v", membersByOrgs)
 	return wrapPeerResponse(membersByOrgs)
 }
 

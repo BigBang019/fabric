@@ -98,7 +98,6 @@ func (ea *endorsementAnalyzer) PeersForEndorsement(channelID common.ChannelID, i
 		logger.Warningf("Principal set computation failed: %v", err)
 		return nil, errors.WithStack(err)
 	}
-	logger.Info("Here's the logic of computing endorsers!!!")
 	return ea.computeEndorsementResponse(&context{
 		chaincode:           interest.Chaincodes[0].Name,
 		channel:             string(channelID),
@@ -172,7 +171,6 @@ func (ea *endorsementAnalyzer) computeEndorsementResponse(ctx *context) (*discov
 	}, ea.satisfiesPrincipal(ctx.channel, ctx.identitiesOfMembers))
 
 	layouts := computeLayouts(ctx.principalsSets, principalGroups, satGraph)
-	logger.Infof("zxyLayouts: %v", layouts)
 	if len(layouts) == 0 {
 		return nil, errors.New("no peer combination can satisfy the endorsement policy")
 	}
@@ -419,7 +417,7 @@ func endorsersByGroup(criteria *peerMembershipCriteria) map[string]*discovery.Pe
 
 		if len(peerList.Peers) > 0 {
 			res[grp] = peerList
-			logger.Infof("%v computed (%v) peerList: %v", grp, len(peerList.Peers), peerList)
+			// logger.Infof("%v computed (%v) peerList: %v", grp, len(peerList.Peers), peerList)
 		}
 	}
 	return res

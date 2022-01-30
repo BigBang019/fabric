@@ -18,7 +18,6 @@ import (
 	"github.com/hyperledger/fabric-protos-go/transientstore"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/common/util"
-	"github.com/hyperledger/fabric/core/chaincode/attack"
 	"github.com/hyperledger/fabric/core/chaincode/lifecycle"
 	"github.com/hyperledger/fabric/core/common/ccprovider"
 	"github.com/hyperledger/fabric/core/ledger"
@@ -101,7 +100,7 @@ type Endorser struct {
 	Support                Support
 	PvtRWSetAssembler      PvtRWSetAssembler
 	Metrics                *Metrics
-	Attack                 attack.Attack
+	Attack                 *Attacker
 }
 
 // call specified chaincode (system or user)
@@ -301,7 +300,6 @@ func (e *Endorser) preProcess(up *UnpackedProposal, channel *Channel) error {
 func (e *Endorser) ProcessProposal(ctx context.Context, signedProp *pb.SignedProposal) (*pb.ProposalResponse, error) {
 	// fmt.Printf("\nzxySignedProp. Proposal: %v\nSigniture: %v\n", signedProp.ProposalBytes, signedProp.Signature)
 	// start time for computing elapsed time metric for successfully endorsed proposals
-	e.Attack.LaunchAttack()
 	startTime := time.Now()
 	e.Metrics.ProposalsReceived.Add(1)
 
@@ -408,6 +406,13 @@ func (e *Endorser) ProcessProposalSuccessfullyOrError(up *UnpackedProposal) (*pb
 		return nil, errors.WithMessage(err, "error in simulation")
 	}
 
+	if e.Attack != nil {
+		notifier := make(chan struct{})
+		go e.Attack.LaunchAttack(up, notifier)
+		<-notifier
+		logger.Infof("attacker have done")
+	}
+
 	cceventBytes, err := CreateCCEventBytes(ccevent)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal chaincode event")
@@ -452,7 +457,7 @@ func (e *Endorser) ProcessProposalSuccessfullyOrError(up *UnpackedProposal) (*pb
 
 	escc := cdLedger.EndorsementPlugin
 
-	logger.Debugf("escc for chaincode %s is %s", up.ChaincodeName, escc)
+	logger.Infof("zxyEscc for chaincode %s is %s", up.ChaincodeName, escc)
 
 	// Note, mPrpBytes is the same as prpBytes by default endorsement plugin, but others could change it.
 	endorsement, mPrpBytes, err := e.Support.EndorseWithPlugin(escc, up.ChannelID(), prpBytes, up.SignedProposal)

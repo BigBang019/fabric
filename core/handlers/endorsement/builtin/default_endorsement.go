@@ -43,6 +43,8 @@ func (e *DefaultEndorsement) Endorse(prpBytes []byte, sp *peer.SignedProposal) (
 	if err != nil {
 		return nil, nil, errors.Wrapf(err, "could not serialize the signing identity")
 	}
+	// fmt.Printf("zxySigner. type: %v, cert: %v\n", reflect.TypeOf(signer), string(identityBytes[:]))
+	// signer is always peer identity
 
 	// sign the concatenation of the proposal response and the serialized endorser identity with this endorser's key
 	signature, err := signer.Sign(append(prpBytes, identityBytes...))

@@ -9,12 +9,10 @@ package validation
 import (
 	"bytes"
 	"fmt"
-	"os"
 
 	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric-protos-go/ledger/rwset"
 	"github.com/hyperledger/fabric-protos-go/peer"
-	"github.com/hyperledger/fabric-sdk-go/pkg/util/protolator"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/core/ledger"
 	"github.com/hyperledger/fabric/core/ledger/internal/version"
@@ -226,12 +224,6 @@ func validatePvtdata(tx *transaction, pvtdata *ledger.TxPvtData) error {
 		}
 	}
 	return nil
-}
-
-func ParseBlock(block *common.Block) {
-	if err := protolator.DeepMarshalJSON(os.Stdout, block); err != nil {
-		logger.Error(err)
-	}
 }
 
 // preprocessProtoBlock parses the proto instance of block into 'Block' structure.

@@ -14,7 +14,6 @@ import (
 	"github.com/golang/protobuf/proto"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/util"
-	"github.com/hyperledger/fabric/core/chaincode/attack"
 	"github.com/hyperledger/fabric/core/chaincode/extcc"
 	"github.com/hyperledger/fabric/core/chaincode/lifecycle"
 	"github.com/hyperledger/fabric/core/common/ccprovider"
@@ -72,7 +71,6 @@ type ChaincodeSupport struct {
 	Runtime                Runtime
 	TotalQueryLimit        int
 	UserRunsCC             bool
-	Attack                 attack.Attack
 }
 
 // Launch starts executing chaincode if it is not already running. This method
@@ -202,7 +200,6 @@ func (cs *ChaincodeSupport) Invoke(txParams *ccprovider.TransactionParams, chain
 	// 3. -- generate RWset
 	// 4. maintain
 	// 5. input <- parse msg
-	// chaincodeLogger.Infof("%v", cs.Attack.GetInfo())
 	h, err := cs.Launch(ccid)
 	if err != nil {
 		return nil, err

@@ -77,7 +77,7 @@ func UnaryServerInterceptor(logger *zap.Logger, opts ...Option) grpc.UnaryServer
 
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		logger := logger
-		// logger.Sugar().Infof("unary call start: %v, %v, %v", handler, req, info)
+		logger.Sugar().Infof("unary call start: %v, %v", handler, info)
 		startTime := time.Now()
 
 		fields := getFields(ctx, info.FullMethod)

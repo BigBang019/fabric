@@ -48,6 +48,7 @@ func (s *DiscoverySupport) PoliciesByChaincode(channel string, cc string, collec
 		logger.Errorf("Failed unmarshaling policy for chaincode '%s': %s", cc, err)
 		return nil
 	}
+	logger.Infof("zxyPol. Rule: %v, identities: %v.", pol.Rule, pol.Identities)
 	if len(pol.Identities) == 0 || pol.Rule == nil {
 		logger.Errorf("Invalid policy, either Identities(%v) or Rule(%v) are empty", pol.Identities, pol.Rule)
 		return nil

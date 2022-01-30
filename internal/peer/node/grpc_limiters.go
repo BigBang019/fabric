@@ -8,6 +8,7 @@ package node
 
 import (
 	"context"
+	"reflect"
 	"strings"
 
 	"github.com/hyperledger/fabric/common/semaphore"
@@ -64,6 +65,7 @@ func streamGrpcLimiter(semaphores map[string]semaphore.Semaphore) grpc.StreamSer
 			return errors.Errorf("too many requests for %s, exceeding concurrency limit (%d)", serviceName, cap(sema))
 		}
 		defer sema.Release()
+		logger.Infof("zxyStreamCall: %v", reflect.TypeOf(handler))
 		return handler(srv, ss)
 	}
 }

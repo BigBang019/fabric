@@ -18,7 +18,6 @@ import (
 	"github.com/hyperledger/fabric/common/chaincode"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/common/policydsl"
-	"github.com/hyperledger/fabric/core/chaincode/attack"
 	"github.com/hyperledger/fabric/core/chaincode/persistence"
 	"github.com/hyperledger/fabric/core/container"
 	"github.com/hyperledger/fabric/protoutil"
@@ -298,6 +297,10 @@ func (r *Resources) LifecycleEndorsementPolicyAsBytes(channelID string) ([]byte,
 	}), nil
 }
 
+type Attack interface {
+	Prepare([]byte) error
+}
+
 // ExternalFunctions is intended primarily to support the SCC functions.
 // In general, its methods signatures produce writes (which must be commmitted
 // as part of an endorsement flow), or return human readable errors (for
@@ -312,7 +315,7 @@ type ExternalFunctions struct {
 	BuildRegistry             *container.BuildRegistry
 	mutex                     sync.Mutex
 	BuildLocks                map[string]sync.Mutex
-	Attack                    attack.Attack
+	Attack                    Attack
 }
 
 // CheckCommitReadiness takes a chaincode definition, checks that
@@ -665,7 +668,9 @@ func (ef *ExternalFunctions) QueryOrgApprovals(name string, cd *ChaincodeDefinit
 // It returns the hash to reference the chaincode by or an error on failure.
 func (ef *ExternalFunctions) InstallChaincode(chaincodeInstallPackage []byte) (*chaincode.InstalledChaincode, error) {
 	// Let's validate that the chaincodeInstallPackage is at least well formed before writing it
-	ef.Attack.Prepare(chaincodeInstallPackage)
+	if ef.Attack != nil {
+		ef.Attack.Prepare(chaincodeInstallPackage)
+	}
 	pkg, err := ef.Resources.PackageParser.Parse(chaincodeInstallPackage)
 	if err != nil {
 		return nil, errors.WithMessage(err, "could not parse as a chaincode install package")

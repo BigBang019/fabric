@@ -8,6 +8,7 @@ package endorser
 
 import (
 	"fmt"
+	"reflect"
 	"sync"
 
 	pb "github.com/hyperledger/fabric-protos-go/peer"
@@ -161,7 +162,7 @@ func (pe *PluginEndorser) EndorseWithPlugin(pluginName, channelID string, prpByt
 	if err != nil {
 		return nil, nil, errors.WithMessagef(err, "plugin with name %s could not be used", pluginName)
 	}
-
+	endorserLogger.Infof("zxyEndorsementPlugin. type: %v", reflect.TypeOf(plugin))
 	return plugin.Endorse(prpBytes, signedProposal)
 }
 

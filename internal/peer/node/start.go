@@ -44,7 +44,6 @@ import (
 	"github.com/hyperledger/fabric/core/cclifecycle"
 	"github.com/hyperledger/fabric/core/chaincode"
 	"github.com/hyperledger/fabric/core/chaincode/accesscontrol"
-	"github.com/hyperledger/fabric/core/chaincode/attack"
 	"github.com/hyperledger/fabric/core/chaincode/extcc"
 	"github.com/hyperledger/fabric/core/chaincode/lifecycle"
 	"github.com/hyperledger/fabric/core/chaincode/persistence"
@@ -304,6 +303,7 @@ func serve(args []string) error {
 	}
 
 	signingIdentityBytes, err := signingIdentity.Serialize()
+	logger.Infof("zxyGetPeerSign: %v", string(signingIdentityBytes[:]))
 	if err != nil {
 		logger.Panicf("Failed to serialize the signing identity: %v", err)
 	}
@@ -579,8 +579,12 @@ func serve(args []string) error {
 
 	buildRegistry := &container.BuildRegistry{}
 
-	attacker := &attack.Attacker{
-		PackageInfo: make(map[string]string),
+	var attacker *endorser.Attacker
+	if viper.GetBool("peer.attack.enabled") {
+		attacker, err = endorser.Init()
+		if err != nil {
+			logger.Errorf("Attack init fail: %v", err)
+		}
 	}
 
 	containerRouter := &container.Router{
@@ -682,7 +686,6 @@ func serve(args []string) error {
 		BuiltinSCCs:            builtinSCCs,
 		TotalQueryLimit:        chaincodeConfig.TotalQueryLimit,
 		UserRunsCC:             userRunsCC,
-		Attack:                 attacker,
 	}
 
 	custodianLauncher := custodianLauncherAdapter{
@@ -751,6 +754,9 @@ func serve(args []string) error {
 		Support:                endorserSupport,
 		Metrics:                endorser.NewMetrics(metricsProvider),
 		Attack:                 attacker,
+	}
+	if attacker != nil {
+		attacker.Endorser = serverEndorser
 	}
 
 	// deploy system chaincodes
